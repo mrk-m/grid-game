@@ -199,4 +199,50 @@ public class Grid {
             }
         }
     }
+
+    public boolean validateChunkPlayable(Chunk chunk) {
+
+        boolean playable = false;
+
+        for (int gridX = 0; gridX < WIDTH; gridX++) {
+            for (int gridY = 0; gridY < HEIGHT; gridY++) {
+                int startX = gridX - 2;
+                int startY = gridY - 2;
+
+
+                boolean isValid = true;
+
+                for (int ix = 0; ix < 5; ix++) {
+                    for (int iy = 0; iy < 5; iy++) {
+                        if ((ix + startX >= 0 && ix + startX < WIDTH) &&
+                                (iy + startY >= 0 && iy + startY < HEIGHT)) {
+
+                            if (
+                                    (blocks[(iy + startY) * WIDTH + (ix + startX)] != 0 ||
+                                            blocksMask[(iy + startY) * WIDTH + (ix + startX)] != 0) &&
+                                            chunk.data[iy * Chunk.SIZE + ix] != 0) {
+                                isValid = false;
+                            } else {
+                            }
+                        } else {
+                            if (chunk.data[iy * Chunk.SIZE + ix] != 0) {
+                                isValid = false;
+
+                            }
+                        }
+                    }
+                }
+
+                if (isValid) {
+                    playable = true;
+                }
+            }
+        }
+
+        return playable;
+    }
+
+    public void reset() {
+        clear();
+    }
 }

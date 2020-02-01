@@ -6,6 +6,8 @@ public class Palette {
 
     public static final int BACKGROUND = Color.rgb(58, 60, 62);
     public static final int FOREGROUND = Color.LTGRAY;
+    public static final int MIDGROUND = Color.GRAY;
+    public static final int BLACK = Color.BLACK;
 
     public static int[] colors = {
             Color.rgb(77, 79, 81),
