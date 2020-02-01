@@ -135,14 +135,74 @@ public class Chunk {
     public float x,y;
     public float originX, originY;
 
+    public float width, height;
+
+    public float scale;
+    public float targetScale;
+
+    public float padding;
+    public float targetPadding;
+
+    public float offsetX;
+    public float offsetY;
+
     public Chunk(float x, float y) {
         this.x = x;
         this.y = y;
         originX = x;
         originY = y;
 
+        scale = 2f;
+        targetScale = 2f;
+
+        padding = Chunk.BLOCK_PADDING;
+        targetPadding = Chunk.BLOCK_PADDING;
+
         int type = new Random().nextInt(CHUNKS.length);
         data = CHUNKS[type];
+//        int[] test = {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1};
+//        data = test;
+
+        // Calculate width and height
+
+        // width
+        int leftIndex = SIZE;
+        int rightIndex = 0;
+        for (int iy = 0; iy < SIZE; iy++) {
+            for (int ix = 0; ix < SIZE; ix++) {
+                if (data[iy * SIZE + ix] != 0) {
+                    if (ix < leftIndex) {
+                        leftIndex = ix;
+                    }
+                    if (ix > rightIndex) {
+                        rightIndex = ix;
+                    }
+                }
+            }
+        }
+
+        height = 1 + rightIndex - leftIndex;
+
+        // height
+        int topIndex = SIZE;
+        int bottomIndex = 0;
+        for (int ix = 0; ix < SIZE; ix++) {
+            for (int iy = 0; iy < SIZE; iy++) {
+                if (data[iy * SIZE + ix] != 0) {
+                    if (iy < topIndex) {
+                        topIndex = iy;
+                    }
+                    if (iy > bottomIndex) {
+                        bottomIndex = iy;
+                    }
+                }
+            }
+        }
+
+        width = 1 + rightIndex - leftIndex;
+
+        height = 5;
+        width = 5;
 
         color = new Random().nextInt(Palette.colors.length - 1) + 1;
 
@@ -157,6 +217,14 @@ public class Chunk {
 
         if (y != originY) {
             y -= (y - originY) / 5;
+        }
+
+        if (scale != targetScale) {
+            scale += (targetScale - scale) / 5;
+        }
+
+        if (padding != targetPadding) {
+            padding += (targetPadding - padding) / 5;
         }
     }
 

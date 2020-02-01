@@ -13,11 +13,13 @@ public class Grid {
     public static final int WIDTH = 10;
     public static final int HEIGHT = 10;
 
-    private int x, y;
+    public int x, y;
     private int scaleWidth, scaleHeight;
 
     private int[] blocks;
     private int[] blocksMask;
+
+    public boolean[] mask;
 
     public Grid() {
         blocks = new int[WIDTH * HEIGHT];
@@ -61,12 +63,20 @@ public class Grid {
         canvas.translate(-x,-y);
     }
 
-    public Point getPos(float x, float y) {
-        return new Point((int) ((x - this.x) / Chunk.BLOCK_SIZE), (int) ((y - this.y) / Chunk.BLOCK_SIZE));
+    public Point getPos(float x, float y, float width, float height) {
+        return new Point((int) (((x - this.x) / Chunk.BLOCK_SIZE)), (int) (((y - this.y) / Chunk.BLOCK_SIZE) - height / 2));
+    }
+
+    public float getPosY(float touchY) {
+        return y + ((((int) (touchY + Chunk.BLOCK_SIZE / 2 - y) / Chunk.BLOCK_SIZE)) * Chunk.BLOCK_SIZE);
+    }
+
+    public float getPosX(float touchX) {
+        return x + ((((int) (touchX - x) / Chunk.BLOCK_SIZE)) * Chunk.BLOCK_SIZE  + Chunk.BLOCK_SIZE / 2);
     }
 
     public boolean validate(float touchX, float touchY, Chunk chunk) {
-        Point pos = getPos(touchX, touchY);
+        Point pos = getPos(touchX, touchY, chunk.width, chunk.height);
         int gridX = pos.x;
         int gridY = pos.y;
 
@@ -102,7 +112,7 @@ public class Grid {
     }
 
     public void place(float touchX, float touchY, Chunk chunk) {
-        Point pos = getPos(touchX, touchY);
+        Point pos = getPos(touchX, touchY, chunk.width, chunk.height);
         int gridX = pos.x;
         int gridY = pos.y;
 
@@ -129,7 +139,7 @@ public class Grid {
 
 
     public float update() {
-        boolean[] mask = new boolean[WIDTH * HEIGHT];
+        mask = new boolean[WIDTH * HEIGHT];
 
         float score = 0;
 
@@ -179,14 +189,6 @@ public class Grid {
         }
 
         return score;
-    }
-
-    public float getPosY(float touchY) {
-        return y + ((int) (touchY - y) / Chunk.BLOCK_SIZE - 2) * Chunk.BLOCK_SIZE;
-    }
-
-    public float getPosX(float touchX) {
-        return x + ((int) (touchX - x) / Chunk.BLOCK_SIZE - 2) * Chunk.BLOCK_SIZE;
     }
 
     public void placeMask() {

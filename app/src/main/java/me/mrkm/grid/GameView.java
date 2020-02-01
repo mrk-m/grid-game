@@ -33,6 +33,8 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
     private int counter = 0;
     private boolean restock = false;
 
+    private Mask mask;
+
     public GameView(Context context) {
         super(context);
 
@@ -62,7 +64,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 
     private void resetChunks() {
         for (int i = 0; i < NUMBER_OF_CHUNKS; i++) {
-            chunks[i] = new Chunk(i * screenWidth / NUMBER_OF_CHUNKS - Chunk.BLOCK_SIZE, screenHeight - (screenHeight - screenWidth) / 2);
+            chunks[i] = new Chunk(((float) (((float) i) + 0.5f) * (screenWidth / NUMBER_OF_CHUNKS)), (screenHeight - (screenHeight - screenWidth) / 8));
             chunks[i].x += screenWidth;
         }
     }
@@ -87,7 +89,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 
     private void handleTouch() {
         if (touch) {
-            if (chunk == null) {
+            if (chunk == null &&  counter > 12) {
                 if (touchY > screenHeight - (screenHeight - screenWidth) / 2) {
                     for (int i = 0; i < NUMBER_OF_CHUNKS; i++) {
                         if (touchX > i * screenWidth / NUMBER_OF_CHUNKS &&
@@ -95,6 +97,9 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
                             if (!chunks[i].used) {
                                 chunk = chunks[i];
                                 chunk.used = true;
+                                chunk.targetScale = 1;
+                                chunk.targetPadding = Chunk.BLOCK_PADDING * 2;
+
                             }
                         }
                     }
@@ -102,17 +107,23 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
             }
         } else {
             if (chunk != null) {
-                boolean valid = grid.validate(touchX, touchY, chunk);
+                float vx = touchX;
+                float vy = touchY;
+
+                boolean valid = grid.validate(vx, vy, chunk);
                 System.out.println("valid:"+valid);
                 if (valid) {
                     score += scoreChunk(chunk);
-                    grid.place(touchX, touchY, chunk);
+                    grid.place(vx, vy, chunk);
+                    chunk.targetPadding = Chunk.BLOCK_PADDING;
                     counter = 0;
-                    score += grid.update();
 
-                    chunk.setOrigin(grid.getPosX(touchX), grid.getPosY(touchY));
+
+                    chunk.setOrigin(grid.getPosX(vx), grid.getPosY(vy));
                 } else {
                     chunk.used = false;
+                    chunk.targetScale = 2;
+                    chunk.targetPadding = Chunk.BLOCK_PADDING;
                 }
             }
 
@@ -146,8 +157,8 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
         }
 
         if (chunk != null) {
-            chunk.x = touchX - Chunk.BLOCK_SIZE * 2.5f;
-            chunk.y = touchY - Chunk.BLOCK_SIZE * 2.5f;
+            chunk.x = touchX;
+            chunk.y = touchY - chunk.height;
         }
 
 
@@ -155,8 +166,8 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
             counter++;
         } else if (counter == 12) {
             grid.placeMask();
-            grid.update();
-
+            score += grid.update();
+            mask = new Mask(grid.mask);
             for (int i = 0; i < NUMBER_OF_CHUNKS; i++) {
                 if (chunks[i].used) {
                     chunks[i].active = false;
@@ -170,6 +181,9 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
             counter++;
         }
 
+        if (mask != null)
+        mask.update();
+
     }
 
     @Override
@@ -181,6 +195,8 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
             grid.draw(canvas, paint);
             
             drawChunks(canvas);
+
+            drawMask(canvas);
 
             paint.setColor(Palette.FOREGROUND);
             paint.setTextSize(100);
@@ -196,37 +212,51 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
             if (chunks[i].active) {
                 canvas.translate(chunks[i].x, chunks[i].y);
 
-                if (!chunks[i].used) {
-                    canvas.translate(Chunk.BLOCK_SIZE * 1.6f, 0);
-
-                    canvas.scale(1f/2, 1f/2);
-                }
+                canvas.scale(1f/chunks[i].scale, 1f/chunks[i].scale);
 
                 for (int y = 0; y < Chunk.SIZE; y++) {
                     for (int x = 0; x < Chunk.SIZE; x++) {
                         if (chunks[i].data[y * Chunk.SIZE + x] != 0) {
                             paint.setColor(Palette.getColor(chunks[i].color));
-                            canvas.drawRect(x * Chunk.BLOCK_SIZE + Chunk.BLOCK_PADDING,
-                                    y * Chunk.BLOCK_SIZE + Chunk.BLOCK_PADDING,
-                                    (x + 1) * Chunk.BLOCK_SIZE - Chunk.BLOCK_PADDING,
-                                    (y + 1) * Chunk.BLOCK_SIZE - Chunk.BLOCK_PADDING,
+                            canvas.drawRect((x - chunks[i].width / 2)  * Chunk.BLOCK_SIZE + chunks[i].padding,
+                                    (y - chunks[i].height) * Chunk.BLOCK_SIZE + chunks[i].padding,
+                                    ((x + 1) - chunks[i].width / 2) * Chunk.BLOCK_SIZE - chunks[i].padding,
+                                    ((y + 1) - chunks[i].height) * Chunk.BLOCK_SIZE - chunks[i].padding,
                                     paint);
                         }
                     }
                 }
 
-                if (!chunks[i].used) {
-
-                    canvas.scale(1f*2, 1f*2);
-                    canvas.translate(-Chunk.BLOCK_SIZE * 1.6f, 0);
-
-                }
+                canvas.scale(1f*chunks[i].scale, 1f*chunks[i].scale);
 
                 canvas.translate(-chunks[i].x,-chunks[i].y);
             }
 
         }
     }
+
+    private void drawMask(Canvas canvas) {
+        if (mask != null)
+        if (!mask.hidden) {
+            canvas.translate(grid.x, grid.y);
+
+            for (int y = 0; y < Grid.HEIGHT; y++) {
+                for (int x = 0; x < Grid.WIDTH; x++) {
+                    if (mask.data[y * Grid.WIDTH + x]) {
+                        paint.setColor(Palette.FOREGROUND);
+                        canvas.drawRect((x) * Chunk.BLOCK_SIZE + mask.padding,
+                                (y) * Chunk.BLOCK_SIZE + mask.padding,
+                                ((x + 1)) * Chunk.BLOCK_SIZE - mask.padding,
+                                ((y + 1)) * Chunk.BLOCK_SIZE - mask.padding,
+                                paint);
+                    }
+                }
+            }
+
+            canvas.translate(-grid.x, -grid.y);
+        }
+    }
+
 
     @Override
     public void surfaceCreated(SurfaceHolder surfaceHolder) {
