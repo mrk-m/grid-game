@@ -3,95 +3,94 @@ package me.mrkm.grid;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.Point;
 import android.graphics.RectF;
+
+import java.util.Vector;
 
 public class Grid {
 
-    public static float cellSize;
-    public static float cellPadding;
-    public static float cellRadius;
+    public static final int WIDTH = 10;
+    public static final int HEIGHT = 10;
 
-    private float screenWidth, screenHeight;
+    private int x, y;
+    private int scaleWidth, scaleHeight;
 
-    private int width = 10;
-    private int height = 10;
+    private int[] blocks;
+    private int[] blocksMask;
 
-    private Cell[][] cells;
+    public Grid() {
+        blocks = new int[WIDTH * HEIGHT];
+        blocksMask = new int[WIDTH * HEIGHT];
 
-    public float score = 0f;
 
-    public Grid(int screenWidth, int screenHeight) {
-        this.screenWidth = screenWidth;
-        this.screenHeight = screenHeight;
+        clear();
+    }
 
-        cellSize = this.screenWidth  / 11;
-        cellPadding = cellSize / 20;
-        cellRadius = cellSize / 10;
+    public void setPosition(int screenWidth, int screenHeight) {
+        scaleWidth = WIDTH * Chunk.BLOCK_SIZE;
+        scaleHeight = HEIGHT * Chunk.BLOCK_SIZE;
 
-        cells = new Cell[width][height];
+        x = (screenWidth - scaleWidth) / 2;
+        y = (screenHeight - scaleHeight) / 2;
+    }
 
-        for (int y = 0; y < height; y++) {
-            for(int x = 0; x < width; x++) {
-                int color = Color.LTGRAY;
-//                float[] hsv = {255f / (width * height) * (x * 2) * y, 1f, 1f};
-//                color = Color.HSVToColor(hsv);
-                cells[x][y] = new Cell(x, y, color, false);
+    private void clear() {
+        for (int y = 0; y < HEIGHT; y++) {
+            for (int x = 0; x < WIDTH; x++) {
+                blocks[y * WIDTH + x] = 0;
+                blocksMask[y * WIDTH + x] = 0;
             }
         }
     }
 
     public void draw(Canvas canvas, Paint paint) {
-        canvas.translate(screenWidth / 2 - width * cellSize / 2,screenHeight / 2 - height * cellSize / 2);
+        canvas.translate(x,y);
 
-        for (int y = 0; y < height; y++) {
-            for (int x = 0; x < width; x++) {
-                drawCell(cells[x][y], canvas, paint);
+        for (int y = 0; y < HEIGHT; y++) {
+            for (int x = 0; x < WIDTH; x++) {
+                paint.setColor(Palette.getColor(blocks[y * WIDTH + x]));
+                canvas.drawRect(x * Chunk.BLOCK_SIZE + Chunk.BLOCK_PADDING,
+                        y * Chunk.BLOCK_SIZE  + Chunk.BLOCK_PADDING,
+                        (x+1) * Chunk.BLOCK_SIZE - Chunk.BLOCK_PADDING,
+                        (y+1) * Chunk.BLOCK_SIZE - Chunk.BLOCK_PADDING,
+                        paint);
             }
         }
 
-        canvas.translate(-(screenWidth / 2 - width * cellSize / 2),-(screenHeight / 2 - height * cellSize / 2));
-
+        canvas.translate(-x,-y);
     }
 
-    private void drawCell(Cell cell, Canvas canvas, Paint paint) {
-
-
-        float left = cell.x * cellSize + cellPadding;
-        float top = cell.y * cellSize + cellPadding;
-
-        float right = (cell.x + 1) * cellSize - cellPadding;
-        float bottom = (cell.y + 1) * cellSize - cellPadding;
-
-        RectF rect = new RectF(left,top,right,bottom);
-
-        paint.setColor(cell.color);
-        canvas.drawRoundRect(rect,cellRadius,cellRadius,paint);
+    public Point getPos(float x, float y) {
+        return new Point((int) ((x - this.x) / Chunk.BLOCK_SIZE), (int) ((y - this.y) / Chunk.BLOCK_SIZE));
     }
 
-    public boolean validate(float touchX, float touchY, Piece pickUp) {
-        float x = touchX - (screenWidth / 2 - width * cellSize / 2);
-        float y = touchY - (screenHeight / 2 - height * cellSize / 2) - cellSize / 2;
+    public boolean validate(float touchX, float touchY, Chunk chunk) {
+        Point pos = getPos(touchX, touchY);
+        int gridX = pos.x;
+        int gridY = pos.y;
 
-        // TOP LEFT
-        int sx = (int) (x / cellSize) - 2;
-        int sy = (int) (y / cellSize) - 4;
-
-//        if ((sx >= 0 && sx < width) && (sy >= 0 && sy < height)) {
-//            cells[sx][sy].color = Color.GREEN;
-//        }
+        System.out.println("x" + gridX + " y" + gridY);
 
 
-        // ITERATE THROUGH VCEELLS
+        int startX = gridX - 2;
+        int startY = gridY - 2;
+
         boolean isValid = true;
 
         for (int ix = 0; ix < 5; ix++) {
             for (int iy = 0; iy < 5; iy++) {
-                if ((ix + sx >= 0 && ix + sx < width) && (iy + sy >= 0 && iy + sy < height)) {
-                    if (cells[ix + sx][iy + sy].solid && pickUp.cells[ix][iy].solid) {
+                if ((ix + startX >= 0 && ix + startX < WIDTH) &&
+                        (iy + startY >= 0 && iy + startY < HEIGHT)) {
+
+                    if (
+                            (blocks[(iy + startY) * WIDTH + (ix + startX)] != 0 ||
+                            blocksMask[(iy + startY) * WIDTH + (ix + startX)] != 0) &&
+                            chunk.data[iy * Chunk.SIZE + ix] != 0) {
                         isValid = false;
                     }
                 } else {
-                    if ( pickUp.cells[ix][iy].solid) {
+                    if (chunk.data[iy * Chunk.SIZE + ix] != 0) {
                         isValid = false;
 
                     }
@@ -102,98 +101,100 @@ public class Grid {
         return isValid;
     }
 
-    public void place(float touchX, float touchY, Piece pickUp) {
-        float x = touchX - (screenWidth / 2 - width * cellSize / 2);
-        float y = touchY - (screenHeight / 2 - height * cellSize / 2) - cellSize / 2;
+    public void place(float touchX, float touchY, Chunk chunk) {
+        Point pos = getPos(touchX, touchY);
+        int gridX = pos.x;
+        int gridY = pos.y;
 
-        // TOP LEFT
-        int sx = (int) (x / cellSize) - 2;
-        int sy = (int) (y / cellSize) - 4;
+        int startX = gridX - 2;
+        int startY = gridY - 2;
 
-//        if ((sx >= 0 && sx < width) && (sy >= 0 && sy < height)) {
-//            cells[sx][sy].color = Color.GREEN;
-//        }
-
-
-        // ITERATE THROUGH VCEELLS
-        boolean isValid = true;
 
         for (int ix = 0; ix < 5; ix++) {
             for (int iy = 0; iy < 5; iy++) {
-                if ((ix + sx >= 0 && ix + sx < width) && (iy + sy >= 0 && iy + sy < height)) {
-                    if (cells[ix + sx][iy + sy].solid && pickUp.cells[ix][iy].solid) {
-                        isValid = false;
-                    } else {
-                        if (pickUp.cells[ix][iy].solid) {
-                            cells[ix + sx][iy + sy].color = pickUp.cells[ix][iy].color;
-                            cells[ix + sx][iy + sy].solid = pickUp.cells[ix][iy].solid;
-                        }
+                if ((ix + startX >= 0 && ix + startX < WIDTH) &&
+                        (iy + startY >= 0 && iy + startY < HEIGHT)) {
 
-                    }
-                } else {
-                    if ( pickUp.cells[ix][iy].solid) {
-                        isValid = false;
-
+                    if ((blocks[(iy + startY) * WIDTH + ix + startX] == 0 &&
+                            blocksMask[(iy + startY) * WIDTH + ix + startX] == 0 &&
+                            chunk.data[iy * Chunk.SIZE + ix] != 0)) {
+                        // PLACE
+                        blocksMask[(iy + startY) * WIDTH + ix + startX] = chunk.color;
                     }
                 }
             }
         }
     }
 
-    public void update() {
-        boolean[][] mask = new boolean[width][height];
+
+
+    public float update() {
+        boolean[] mask = new boolean[WIDTH * HEIGHT];
+
+        float score = 0;
 
         // rows
-        for (int y = 0; y < height; y++) {
+        for (int y = 0; y < HEIGHT; y++) {
             boolean clear = true;
 
-            for (int x = 0; x < width; x++) {
-                if (!cells[x][y].solid) {
+            for (int x = 0; x < WIDTH; x++) {
+                if (blocks[y * WIDTH + x] == 0) {
                     clear = false;
                 }
             }
 
             if (clear) {
-                for (int x = 0; x < width; x++) {
-                    mask[x][y] = true;
+                for (int x = 0; x < WIDTH; x++) {
+                    mask[y * WIDTH + x] = true;
                 }
             }
         }
 
         // columns
-        for (int x = 0; x < height; x++) {
+        for (int x = 0; x < WIDTH; x++) {
             boolean clear = true;
 
-            for (int y = 0; y < height; y++) {
-                if (!cells[x][y].solid) {
+            for (int y = 0; y < HEIGHT; y++) {
+                if (blocks[y * WIDTH + x] == 0) {
                     clear = false;
                 }
             }
 
             if (clear) {
-                for (int y = 0; y < height; y++) {
-                    mask[x][y] = true;
+                for (int y = 0; y < HEIGHT; y++) {
+                    mask[y * WIDTH + x] = true;
                 }
             }
         }
-
-        float scoreAdd = 1;
 
         // clear mask
-        for (int x = 0; x < height; x++) {
-            for (int y = 0; y < height; y++) {
-                if (mask[x][y]) {
-                    cells[x][y].solid = false;
-                    cells[x][y].color = Color.LTGRAY;
-                    scoreAdd += 1;
-                    scoreAdd *= 1.1;
+        for (int x = 0; x < WIDTH; x++) {
+            for (int y = 0; y < HEIGHT; y++) {
+                if (mask[y * WIDTH + x]) {
+                    blocks[y * WIDTH + x] = 0;
+                    score += 1;
+                    score *= 1.1;
                 }
             }
         }
 
+        return score;
+    }
 
-        // calculate score
-        System.out.println(scoreAdd);
-        score += scoreAdd;
+    public float getPosY(float touchY) {
+        return y + ((int) (touchY - y) / Chunk.BLOCK_SIZE - 2) * Chunk.BLOCK_SIZE;
+    }
+
+    public float getPosX(float touchX) {
+        return x + ((int) (touchX - x) / Chunk.BLOCK_SIZE - 2) * Chunk.BLOCK_SIZE;
+    }
+
+    public void placeMask() {
+        for (int i = 0; i < blocks.length; i++) {
+            if (blocksMask[i] != 0) {
+                blocks[i] = blocksMask[i];
+                blocksMask[i] = 0;
+            }
+        }
     }
 }
