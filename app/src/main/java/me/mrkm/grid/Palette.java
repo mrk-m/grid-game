@@ -4,10 +4,11 @@ import android.graphics.Color;
 
 public class Palette {
 
-    public static final int BACKGROUND = Color.rgb(58, 60, 62);
-    public static final int FOREGROUND = Color.LTGRAY;
-    public static final int MIDGROUND = Color.GRAY;
-    public static final int BLACK = Color.BLACK;
+    public static int BACKGROUND = Color.rgb(58, 60, 62);
+    public static int FOREGROUND = Color.LTGRAY;
+    public static int TEXT = Color.LTGRAY;
+    public static int MIDGROUND = Color.GRAY;
+    public static int BLACK = Color.BLACK;
 
     public static int[] colors = {
             Color.rgb(77, 79, 81),
@@ -25,4 +26,19 @@ public class Palette {
         return colors[id];
     }
 
+    public static void setLight() {
+        FOREGROUND = Color.rgb(58, 60, 62);
+        BACKGROUND = Color.WHITE;
+        MIDGROUND = Color.GRAY;
+        colors[0] = Color.LTGRAY;
+
+
+    }
+
+    public static void setDark() {
+        FOREGROUND = Color.LTGRAY;
+        BACKGROUND = Color.rgb(58, 60, 62);
+        MIDGROUND = Color.GRAY;
+        colors[0] = Color.rgb(77, 79, 81);
+    }
 }
