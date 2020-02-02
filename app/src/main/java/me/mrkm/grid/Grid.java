@@ -245,4 +245,28 @@ public class Grid {
     public void reset() {
         clear();
     }
+
+    public void load(String dataString) {
+        for (int i = 0; i < blocks.length; i++) {
+            blocks[i] = (byte) dataString.charAt(i);
+        }
+
+        for (int i = 0; i < blocksMask.length; i++) {
+            blocksMask[i] = (byte) dataString.charAt(i + blocks.length);;
+        }
+    }
+
+    public String save() {
+        String data = "";
+
+        for (int i = 0; i < blocks.length; i++) {
+            data += ((char)((byte)blocks[i]));
+        }
+
+        for (int i = 0; i < blocksMask.length; i++) {
+            data += ((char)((byte)blocksMask[i]));
+        }
+
+        return data;
+    }
 }

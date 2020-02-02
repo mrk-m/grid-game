@@ -7,7 +7,7 @@ public class MainThread extends Thread {
 
     private SurfaceHolder surfaceHolder;
     private GameView gameView;
-    private boolean running;
+    public boolean running;
     public static Canvas canvas;
     private int targetFPS = 60;
     private double averageFPS;

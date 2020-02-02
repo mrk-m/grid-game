@@ -11,6 +11,8 @@ public class Palette {
     public static int MIDGROUND = Color.GRAY;
     public static int BLACK = Color.BLACK;
 
+    public static int THEME_ID = 0;
+
     public static int[] colors = {
             Color.rgb(77, 79, 81),
             Color.rgb(0, 160, 220),
@@ -32,7 +34,7 @@ public class Palette {
         BACKGROUND = Color.WHITE;
         MIDGROUND = Color.GRAY;
         colors[0] = Color.LTGRAY;
-
+        THEME_ID = 1;
 
     }
 
@@ -41,5 +43,12 @@ public class Palette {
         BACKGROUND = Color.rgb(58, 60, 62);
         MIDGROUND = Color.GRAY;
         colors[0] = Color.rgb(77, 79, 81);
+        THEME_ID = 0;
+    }
+
+    public static void load(int id) {
+        if (id == 1) {
+            setLight();
+        }
     }
 }

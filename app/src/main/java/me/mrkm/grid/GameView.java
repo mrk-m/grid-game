@@ -1,6 +1,8 @@
 package me.mrkm.grid;
 
+import android.app.Activity;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.graphics.Canvas;
 import android.graphics.Paint;
@@ -9,6 +11,7 @@ import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 
+import static android.content.Context.MODE_PRIVATE;
 import static me.mrkm.grid.Menu.*;
 
 public class GameView extends SurfaceView implements SurfaceHolder.Callback {
@@ -51,7 +54,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
     private float splashY;
 
     private RectF playButton, scoreButton, colorButton, settingsButton, resumeButton, exitButton,
-    lightButton, darkButton;
+            lightButton, darkButton;
 
     private boolean pauseDown;
     private boolean playDown;
@@ -70,7 +73,6 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 
         load();
 
-        thread = new MainThread(getHolder(), this);
         setFocusable(true);
     }
 
@@ -78,7 +80,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
         screenWidth = Resources.getSystem().getDisplayMetrics().widthPixels;
         screenHeight = Resources.getSystem().getDisplayMetrics().heightPixels;
 
-        Chunk.setBlockSizeAndPadding(screenWidth  / 11, screenWidth / 220);
+        Chunk.setBlockSizeAndPadding(screenWidth / 11, screenWidth / 220);
 
         paint = new Paint();
         stkPaint = new Paint();
@@ -96,23 +98,25 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
         menu = SPLASH;
 
         playButton =
-                new RectF(Chunk.BLOCK_SIZE, screenHeight / 6 *2- Chunk.BLOCK_SIZE / 2,screenWidth - Chunk.BLOCK_SIZE, screenHeight / 6 *3- Chunk.BLOCK_SIZE);
+                new RectF(Chunk.BLOCK_SIZE, screenHeight / 6 * 2 - Chunk.BLOCK_SIZE / 2, screenWidth - Chunk.BLOCK_SIZE, screenHeight / 6 * 3 - Chunk.BLOCK_SIZE);
         scoreButton =
-                new RectF(Chunk.BLOCK_SIZE, screenHeight / 6*3- Chunk.BLOCK_SIZE / 2,screenWidth - Chunk.BLOCK_SIZE, screenHeight / 6 *4- Chunk.BLOCK_SIZE);
+                new RectF(Chunk.BLOCK_SIZE, screenHeight / 6 * 3 - Chunk.BLOCK_SIZE / 2, screenWidth - Chunk.BLOCK_SIZE, screenHeight / 6 * 4 - Chunk.BLOCK_SIZE);
         colorButton =
-                new RectF(Chunk.BLOCK_SIZE, screenHeight / 6*4- Chunk.BLOCK_SIZE / 2,screenWidth - Chunk.BLOCK_SIZE, screenHeight / 6 *5- Chunk.BLOCK_SIZE);
+                new RectF(Chunk.BLOCK_SIZE, screenHeight / 6 * 4 - Chunk.BLOCK_SIZE / 2, screenWidth - Chunk.BLOCK_SIZE, screenHeight / 6 * 5 - Chunk.BLOCK_SIZE);
         settingsButton =
-                new RectF(Chunk.BLOCK_SIZE, screenHeight / 6*5- Chunk.BLOCK_SIZE / 2,screenWidth - Chunk.BLOCK_SIZE, screenHeight / 6 *6- Chunk.BLOCK_SIZE);
+                new RectF(Chunk.BLOCK_SIZE, screenHeight / 6 * 5 - Chunk.BLOCK_SIZE / 2, screenWidth - Chunk.BLOCK_SIZE, screenHeight / 6 * 6 - Chunk.BLOCK_SIZE);
 
         resumeButton =
-                new RectF(Chunk.BLOCK_SIZE, screenHeight / 6*4- Chunk.BLOCK_SIZE / 2,screenWidth - Chunk.BLOCK_SIZE, screenHeight / 6 *5- Chunk.BLOCK_SIZE);
+                new RectF(Chunk.BLOCK_SIZE, screenHeight / 6 * 4 - Chunk.BLOCK_SIZE / 2, screenWidth - Chunk.BLOCK_SIZE, screenHeight / 6 * 5 - Chunk.BLOCK_SIZE);
         exitButton =
-                new RectF(Chunk.BLOCK_SIZE, screenHeight / 6*5- Chunk.BLOCK_SIZE / 2,screenWidth - Chunk.BLOCK_SIZE, screenHeight / 6 *6- Chunk.BLOCK_SIZE);
+                new RectF(Chunk.BLOCK_SIZE, screenHeight / 6 * 5 - Chunk.BLOCK_SIZE / 2, screenWidth - Chunk.BLOCK_SIZE, screenHeight / 6 * 6 - Chunk.BLOCK_SIZE);
 
         lightButton =
-                new RectF(Chunk.BLOCK_SIZE, screenHeight / 6*3- Chunk.BLOCK_SIZE / 2,screenWidth - Chunk.BLOCK_SIZE, screenHeight / 6 *4- Chunk.BLOCK_SIZE);
+                new RectF(Chunk.BLOCK_SIZE, screenHeight / 6 * 3 - Chunk.BLOCK_SIZE / 2, screenWidth - Chunk.BLOCK_SIZE, screenHeight / 6 * 4 - Chunk.BLOCK_SIZE);
         darkButton =
-                new RectF(Chunk.BLOCK_SIZE, screenHeight / 6*4- Chunk.BLOCK_SIZE / 2,screenWidth - Chunk.BLOCK_SIZE, screenHeight / 6 *5- Chunk.BLOCK_SIZE);
+                new RectF(Chunk.BLOCK_SIZE, screenHeight / 6 * 4 - Chunk.BLOCK_SIZE / 2, screenWidth - Chunk.BLOCK_SIZE, screenHeight / 6 * 5 - Chunk.BLOCK_SIZE);
+
+        loadData();
 
     }
 
@@ -132,7 +136,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
             touch = true;
             if (!touchDownTrigger)
                 touchDown = true;
-                touchDownTrigger = true;
+            touchDownTrigger = true;
         }
 
         if (e.getAction() == MotionEvent.ACTION_UP) {
@@ -145,7 +149,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 
         touchDown = false;
         touchRelease = false;
-        
+
         return true;
     }
 
@@ -397,7 +401,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 
     private void handleMenuDraw(Canvas canvas) {
         if (menu == SPLASH) {
-                        paint.setColor(Palette.FOREGROUND);
+            paint.setColor(Palette.FOREGROUND);
             paint.setTextSize(Chunk.BLOCK_SIZE * 1.5f);
             paint.setTextAlign(Paint.Align.CENTER);
             canvas.drawText("Grid", splashX, splashY, paint);
@@ -472,7 +476,6 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
             paint.setTextSize(Chunk.BLOCK_SIZE * 1f);
             stkPaint.setTextSize(Chunk.BLOCK_SIZE * 1f);
             stkPaint.setTextAlign(Paint.Align.CENTER);
-
 
 
             if (playDown)
@@ -710,15 +713,15 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 
                 paint.setColor(Palette.FOREGROUND);
                 paint.setTextAlign(Paint.Align.LEFT);
-                canvas.drawText(""+(int) displayScore,screenWidth / 2 + Chunk.BLOCK_SIZE,Chunk.BLOCK_SIZE * 2.5f, paint);
+                canvas.drawText("" + (int) displayScore, screenWidth / 2 + Chunk.BLOCK_SIZE, Chunk.BLOCK_SIZE * 2.5f, paint);
 
                 paint.setColor(Palette.MIDGROUND);
                 paint.setTextAlign(Paint.Align.CENTER);
-                canvas.drawText("/",screenWidth / 2,Chunk.BLOCK_SIZE * 2.5f, paint);
+                canvas.drawText("/", screenWidth / 2, Chunk.BLOCK_SIZE * 2.5f, paint);
 
                 paint.setColor(Palette.MIDGROUND);
                 paint.setTextAlign(Paint.Align.RIGHT);
-                canvas.drawText("" + (int) highscore,screenWidth / 2 - Chunk.BLOCK_SIZE,Chunk.BLOCK_SIZE * 2.5f, paint);
+                canvas.drawText("" + (int) highscore, screenWidth / 2 - Chunk.BLOCK_SIZE, Chunk.BLOCK_SIZE * 2.5f, paint);
 
                 if (pauseDown)
                     paint.setColor(Palette.FOREGROUND);
@@ -737,7 +740,6 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
     }
 
 
-
     private void drawChunks(Canvas canvas) {
 
         for (int i = 0; i < NUMBER_OF_CHUNKS; i++) {
@@ -745,13 +747,13 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
             if (chunks[i].active) {
                 canvas.translate(chunks[i].x, chunks[i].y);
 
-                canvas.scale(1f/chunks[i].scale, 1f/chunks[i].scale);
+                canvas.scale(1f / chunks[i].scale, 1f / chunks[i].scale);
 
                 for (int y = 0; y < Chunk.SIZE; y++) {
                     for (int x = 0; x < Chunk.SIZE; x++) {
                         if (chunks[i].data[y * Chunk.SIZE + x] != 0) {
                             paint.setColor(Palette.getColor(chunks[i].color));
-                            canvas.drawRect((x - chunks[i].width / 2)  * Chunk.BLOCK_SIZE + chunks[i].padding,
+                            canvas.drawRect((x - chunks[i].width / 2) * Chunk.BLOCK_SIZE + chunks[i].padding,
                                     (y - chunks[i].height) * Chunk.BLOCK_SIZE + chunks[i].padding,
                                     ((x + 1) - chunks[i].width / 2) * Chunk.BLOCK_SIZE - chunks[i].padding,
                                     ((y + 1) - chunks[i].height) * Chunk.BLOCK_SIZE - chunks[i].padding,
@@ -760,9 +762,9 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
                     }
                 }
 
-                canvas.scale(1f*chunks[i].scale, 1f*chunks[i].scale);
+                canvas.scale(1f * chunks[i].scale, 1f * chunks[i].scale);
 
-                canvas.translate(-chunks[i].x,-chunks[i].y);
+                canvas.translate(-chunks[i].x, -chunks[i].y);
             }
 
         }
@@ -770,31 +772,36 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 
     private void drawMask(Canvas canvas) {
         if (mask != null)
-        if (!mask.hidden) {
-            canvas.translate(grid.x, grid.y);
+            if (!mask.hidden) {
+                canvas.translate(grid.x, grid.y);
 
-            for (int y = 0; y < Grid.HEIGHT; y++) {
-                for (int x = 0; x < Grid.WIDTH; x++) {
-                    if (mask.data[y * Grid.WIDTH + x]) {
-                        paint.setColor(Palette.FOREGROUND);
-                        canvas.drawRect((x) * Chunk.BLOCK_SIZE + mask.padding,
-                                (y) * Chunk.BLOCK_SIZE + mask.padding,
-                                ((x + 1)) * Chunk.BLOCK_SIZE - mask.padding,
-                                ((y + 1)) * Chunk.BLOCK_SIZE - mask.padding,
-                                paint);
+                for (int y = 0; y < Grid.HEIGHT; y++) {
+                    for (int x = 0; x < Grid.WIDTH; x++) {
+                        if (mask.data[y * Grid.WIDTH + x]) {
+                            paint.setColor(Palette.FOREGROUND);
+                            canvas.drawRect((x) * Chunk.BLOCK_SIZE + mask.padding,
+                                    (y) * Chunk.BLOCK_SIZE + mask.padding,
+                                    ((x + 1)) * Chunk.BLOCK_SIZE - mask.padding,
+                                    ((y + 1)) * Chunk.BLOCK_SIZE - mask.padding,
+                                    paint);
+                        }
                     }
                 }
-            }
 
-            canvas.translate(-grid.x, -grid.y);
-        }
+                canvas.translate(-grid.x, -grid.y);
+            }
     }
 
 
     @Override
     public void surfaceCreated(SurfaceHolder surfaceHolder) {
-        thread.setRunning(true);
-        thread.start();
+        if (thread == null || !thread.isAlive()) {
+            thread = new MainThread(getHolder(), this);
+            thread.setRunning(true);
+            System.out.println(thread.getState());
+            thread.start();
+            System.out.println(thread.getState());
+        }
     }
 
     @Override
@@ -804,6 +811,8 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 
     @Override
     public void surfaceDestroyed(SurfaceHolder surfaceHolder) {
+        saveData();
+
         boolean retry = true;
         while (retry) {
             try {
@@ -815,4 +824,78 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
             retry = false;
         }
     }
+
+    private void saveData() {
+        SharedPreferences sharedPreferences = ((Activity) getContext()).getPreferences(MODE_PRIVATE);
+
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putString("GRID", grid.save());
+        editor.putString("CHUNKS", saveChunks());
+        editor.putFloat("SCORE", score);
+        editor.putFloat("HIGHSCORE", highscore);
+        editor.putInt("THEME", Palette.THEME_ID);
+
+        editor.commit();
+
+    }
+
+
+    private void loadData() {
+        SharedPreferences sharedPreferences = ((Activity) getContext()).getPreferences(MODE_PRIVATE);
+
+        if (sharedPreferences.contains("GRID"))
+           grid.load(sharedPreferences.getString("GRID", ""));
+
+        if (sharedPreferences.contains("CHUNKS"))
+            loadChunks(sharedPreferences.getString("CHUNKS", ""));
+
+        if (sharedPreferences.contains("SCORE"))
+            score = sharedPreferences.getFloat("SCORE", 0);
+
+        if (sharedPreferences.contains("HIGHSCORE"))
+            score = sharedPreferences.getFloat("HIGHSCORE", 0);
+
+        if (sharedPreferences.contains("THEME"))
+            Palette.load(sharedPreferences.getInt("THEME", 0));
+    }
+
+
+    private String saveChunks() {
+        String data = "";
+
+        for (int c = 0; c < NUMBER_OF_CHUNKS; c++) {
+            for (int i = 0; i < Chunk.SIZE * Chunk.SIZE; i++) {
+                data += ((char)((byte)chunks[c].data[i]));
+            }
+        }
+
+        for (int c = 0; c < NUMBER_OF_CHUNKS; c++) {
+            data += ((char)((byte)chunks[c].color));
+        }
+
+        for (int c = 0; c < NUMBER_OF_CHUNKS; c++) {
+            data += ((char)((byte) (chunks[c].used ? 1 : 0)));
+        }
+
+        for (int c = 0; c < NUMBER_OF_CHUNKS; c++) {
+            data += ((char)((byte) (chunks[c].active ? 1 : 0)));
+        }
+
+        return data;
+    }
+
+    private void loadChunks(String dataString) {
+        for (int c = 0; c < NUMBER_OF_CHUNKS; c++) {
+            for (int i = 0; i < Chunk.SIZE * Chunk.SIZE; i++) {
+                chunks[c].data[i] = (byte) dataString.charAt(c * Chunk.SIZE * Chunk.SIZE + i);
+            }
+        }
+
+        for (int c = 0; c < NUMBER_OF_CHUNKS; c++) {
+            chunks[c].color = (byte) dataString.charAt(Chunk.SIZE * Chunk.SIZE * NUMBER_OF_CHUNKS + c);
+            chunks[c].used = ((byte) dataString.charAt(Chunk.SIZE * Chunk.SIZE * NUMBER_OF_CHUNKS + NUMBER_OF_CHUNKS + c)) == 1;
+            chunks[c].active = ((byte) dataString.charAt(Chunk.SIZE * Chunk.SIZE * NUMBER_OF_CHUNKS + NUMBER_OF_CHUNKS * 2 + c)) == 1;
+        }
+    }
+
 }
