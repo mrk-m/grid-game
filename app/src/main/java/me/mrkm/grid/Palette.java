@@ -4,6 +4,7 @@ import android.graphics.Color;
 
 public class Palette {
 
+    public static int DARK = Color.rgb(58, 60, 62);
     public static int BACKGROUND = Color.rgb(58, 60, 62);
     public static int FOREGROUND = Color.LTGRAY;
     public static int TEXT = Color.LTGRAY;

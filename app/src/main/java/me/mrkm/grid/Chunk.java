@@ -220,7 +220,7 @@ public class Chunk {
         }
 
         if (scale != targetScale) {
-            scale += (targetScale - scale) / 5;
+            scale += (targetScale - scale) / 3;
         }
 
         if (padding != targetPadding) {

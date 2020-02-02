@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+Google Play game services IDs.
+Save this file as res/values/games-ids.xml in your project.
+-->
+<resources>
+    <!-- app_id -->
+    <string name="app_id" translatable="false">28051725702</string>
+    <!-- package_name -->
+    <string name="package_name" translatable="false">me.mrkm.grid</string>
+    <!-- achievement Game Over -->
+    <string name="achievement_game_over" translatable="false">CggIhruNwGgQAhAB</string>
+    <!-- achievement First Piece -->
+    <string name="achievement_first_piece" translatable="false">CggIhruNwGgQAhAC</string>
+    <!-- achievement 100 Points -->
+    <string name="achievement_100_points" translatable="false">CggIhruNwGgQAhAD</string>
+    <!-- achievement 500 Points -->
+    <string name="achievement_500_points" translatable="false">CggIhruNwGgQAhAE</string>
+    <!-- achievement 1000 Points -->
+    <string name="achievement_1000_points" translatable="false">CggIhruNwGgQAhAF</string>
+    <!-- achievement 10 000 Points -->
+    <string name="achievement_10_000_points" translatable="false">CggIhruNwGgQAhAG</string>
+    <!-- leaderboard High Scores -->
+    <string name="leaderboard_high_scores" translatable="false">CggIhruNwGgQAhAH</string>
+</resources>

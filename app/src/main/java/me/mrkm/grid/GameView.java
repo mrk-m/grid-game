@@ -187,7 +187,6 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
                     float vy = touchY;
 
                     boolean valid = grid.validate(vx, vy, chunk);
-                    System.out.println("valid:"+valid);
                     if (valid) {
                         score += scoreChunk(chunk);
                         grid.place(vx, vy, chunk);
