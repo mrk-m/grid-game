@@ -2,20 +2,34 @@ package me.mrkm.grid;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.RectF;
+import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
+
+import androidx.annotation.NonNull;
+
+import com.google.android.gms.auth.api.signin.GoogleSignIn;
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
+import com.google.android.gms.auth.api.signin.GoogleSignInClient;
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
+import com.google.android.gms.games.Games;
+import com.google.android.gms.games.GamesClient;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 
 import static android.content.Context.MODE_PRIVATE;
 import static me.mrkm.grid.Menu.*;
 
 public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 
+    private static final int AD_HEIGHT = 120;
     private MainThread thread;
     private Paint paint;
     private Paint stkPaint;
@@ -66,7 +80,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
     private boolean lightDown;
     private boolean darkDown;
 
-    public GameView(Context context) {
+    public GameView(Context context, AttributeSet as) {
         super(context);
 
         getHolder().addCallback(this);
@@ -78,7 +92,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 
     public void load() {
         screenWidth = Resources.getSystem().getDisplayMetrics().widthPixels;
-        screenHeight = Resources.getSystem().getDisplayMetrics().heightPixels;
+        screenHeight = Resources.getSystem().getDisplayMetrics().heightPixels - AD_HEIGHT;
 
         Chunk.setBlockSizeAndPadding(screenWidth / 11, screenWidth / 220);
 
@@ -188,7 +202,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
             if (!touch) {
                 if (chunk != null) {
                     float vx = touchX;
-                    float vy = touchY;
+                    float vy = touchY + Chunk.BLOCK_SIZE / 2f;
 
                     boolean valid = grid.validate(vx, vy, chunk);
                     if (valid) {
@@ -362,6 +376,38 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
         resetChunks();
     }
 
+    private void signInSilently() {
+        GoogleSignInOptions signInOptions = GoogleSignInOptions.DEFAULT_GAMES_SIGN_IN;
+        GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(getContext());
+        if (GoogleSignIn.hasPermissions(account, signInOptions.getScopeArray())) {
+            // Already signed in.
+            // The signed in account is stored in the 'account' variable.
+            GoogleSignInAccount signedInAccount = account;
+        } else {
+            // Haven't been signed-in before. Try the silent sign-in first.
+            GoogleSignInClient signInClient = GoogleSignIn.getClient(getContext(), signInOptions);
+            OnCompleteListener<GoogleSignInAccount> listener = new OnCompleteListener<GoogleSignInAccount>() {
+                @Override
+                public void onComplete(@NonNull Task<GoogleSignInAccount> task) {
+                    if (task.isSuccessful()) {
+                        // The signed in account is stored in the task's result.
+                        GoogleSignInAccount signedInAccount = task.getResult();
+                    } else {
+                        startSignInIntent();
+                    }
+                }
+            };
+            signInClient.silentSignIn().addOnCompleteListener(listener);
+        }
+    }
+
+    private void startSignInIntent() {
+        GoogleSignInClient signInClient = GoogleSignIn.getClient(getContext(),
+                GoogleSignInOptions.DEFAULT_GAMES_SIGN_IN);
+        Intent intent = signInClient.getSignInIntent();
+        ((Activity) getContext()).startActivityForResult(intent, 9001);
+    }
+
     private void handleMenuUpdate() {
         if (menu == SPLASH) {
             if (splashCounter == 150) {
@@ -375,6 +421,10 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 
             if (splashCounter > 50) {
                 splashX -= (splashX - screenWidth * 0.5f) / 5;
+            }
+
+            if (splashCounter == 50) {
+                signInSilently();
             }
 
             if (splashCounter < 50) {
@@ -628,7 +678,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 
             if (chunk != null) {
                 chunk.x = touchX;
-                chunk.y = touchY - chunk.height;
+                chunk.y = touchY - Chunk.SIZE;
             }
 
 
@@ -753,10 +803,10 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
                     for (int x = 0; x < Chunk.SIZE; x++) {
                         if (chunks[i].data[y * Chunk.SIZE + x] != 0) {
                             paint.setColor(Palette.getColor(chunks[i].color));
-                            canvas.drawRect((x - chunks[i].width / 2) * Chunk.BLOCK_SIZE + chunks[i].padding,
-                                    (y - chunks[i].height) * Chunk.BLOCK_SIZE + chunks[i].padding,
-                                    ((x + 1) - chunks[i].width / 2) * Chunk.BLOCK_SIZE - chunks[i].padding,
-                                    ((y + 1) - chunks[i].height) * Chunk.BLOCK_SIZE - chunks[i].padding,
+                            canvas.drawRect((x - (float)Chunk.SIZE / 2) * Chunk.BLOCK_SIZE + chunks[i].padding,
+                                    (y - Chunk.SIZE) * Chunk.BLOCK_SIZE + chunks[i].padding,
+                                    ((x + 1) - (float)Chunk.SIZE / 2) * Chunk.BLOCK_SIZE - chunks[i].padding,
+                                    ((y + 1) - Chunk.SIZE) * Chunk.BLOCK_SIZE - chunks[i].padding,
                                     paint);
                         }
                     }

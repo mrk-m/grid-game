@@ -63,28 +63,33 @@ public class Grid {
         canvas.translate(-x,-y);
     }
 
-    public Point getPos(float x, float y, float width, float height) {
-        return new Point((int) (((x - this.x) / Chunk.BLOCK_SIZE)), (int) (((y - this.y) / Chunk.BLOCK_SIZE) - height / 2));
+    public Point getPos(float x, float y) {
+        return new Point(getGridX(x), getGridY(y));
+    }
+
+    private int getGridY(float y) {
+        return (int) (((y - this.y) / Chunk.BLOCK_SIZE));
+    }
+
+    private int getGridX(float x) {
+        return (int) (((x - this.x) / Chunk.BLOCK_SIZE));
     }
 
     public float getPosY(float touchY) {
-        return y + ((((int) (touchY + Chunk.BLOCK_SIZE / 2 - y) / Chunk.BLOCK_SIZE)) * Chunk.BLOCK_SIZE);
+        return y + getGridY(touchY) * Chunk.BLOCK_SIZE;
     }
 
     public float getPosX(float touchX) {
-        return x + ((((int) (touchX - x) / Chunk.BLOCK_SIZE)) * Chunk.BLOCK_SIZE  + Chunk.BLOCK_SIZE / 2);
+        return x + getGridX(touchX) * Chunk.BLOCK_SIZE;
     }
 
     public boolean validate(float touchX, float touchY, Chunk chunk) {
-        Point pos = getPos(touchX, touchY, chunk.width, chunk.height);
+        Point pos = getPos(touchX, touchY);
         int gridX = pos.x;
         int gridY = pos.y;
 
-        System.out.println("x" + gridX + " y" + gridY);
-
-
         int startX = gridX - 2;
-        int startY = gridY - 2;
+        int startY = gridY - 5;
 
         boolean isValid = true;
 
@@ -112,12 +117,12 @@ public class Grid {
     }
 
     public void place(float touchX, float touchY, Chunk chunk) {
-        Point pos = getPos(touchX, touchY, chunk.width, chunk.height);
+        Point pos = getPos(touchX, touchY);
         int gridX = pos.x;
         int gridY = pos.y;
 
         int startX = gridX - 2;
-        int startY = gridY - 2;
+        int startY = gridY - 5;
 
 
         for (int ix = 0; ix < 5; ix++) {
