@@ -145,16 +145,16 @@ public class Chunk {
         originX = x;
         originY = y;
 
-        scale = 2f;
-        targetScale = 2f;
+        scale = 3f;
+        targetScale = 3f;
 
         padding = Chunk.BLOCK_PADDING;
         targetPadding = Chunk.BLOCK_PADDING;
 
         int type = new Random().nextInt(CHUNKS.length);
         data = CHUNKS[type];
-//        int[] test = {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1};
-//        data = test;
+        int[] test = {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1};
+        data = test;
 
         // Calculate width and height
 

@@ -6,8 +6,10 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.RectF;
+import android.os.Build;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
@@ -112,11 +114,11 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
         menu = SPLASH;
 
         playButton =
-                new RectF(Chunk.BLOCK_SIZE, screenHeight / 6 * 2 - Chunk.BLOCK_SIZE / 2, screenWidth - Chunk.BLOCK_SIZE, screenHeight / 6 * 3 - Chunk.BLOCK_SIZE);
+                new RectF(Chunk.BLOCK_SIZE, screenHeight / 5 * 2 - Chunk.BLOCK_SIZE / 2, screenWidth - Chunk.BLOCK_SIZE, screenHeight / 5 * 3 - Chunk.BLOCK_SIZE);
         scoreButton =
-                new RectF(Chunk.BLOCK_SIZE, screenHeight / 6 * 3 - Chunk.BLOCK_SIZE / 2, screenWidth - Chunk.BLOCK_SIZE, screenHeight / 6 * 4 - Chunk.BLOCK_SIZE);
+                new RectF(Chunk.BLOCK_SIZE, screenHeight / 5 * 3 - Chunk.BLOCK_SIZE / 2, screenWidth - Chunk.BLOCK_SIZE, screenHeight / 5 * 4 - Chunk.BLOCK_SIZE);
         colorButton =
-                new RectF(Chunk.BLOCK_SIZE, screenHeight / 6 * 4 - Chunk.BLOCK_SIZE / 2, screenWidth - Chunk.BLOCK_SIZE, screenHeight / 6 * 5 - Chunk.BLOCK_SIZE);
+                new RectF(Chunk.BLOCK_SIZE, screenHeight / 5 * 4 - Chunk.BLOCK_SIZE / 2, screenWidth - Chunk.BLOCK_SIZE, screenHeight / 5 * 5 - Chunk.BLOCK_SIZE);
         settingsButton =
                 new RectF(Chunk.BLOCK_SIZE, screenHeight / 6 * 5 - Chunk.BLOCK_SIZE / 2, screenWidth - Chunk.BLOCK_SIZE, screenHeight / 6 * 6 - Chunk.BLOCK_SIZE);
 
@@ -136,7 +138,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 
     private void resetChunks() {
         for (int i = 0; i < NUMBER_OF_CHUNKS; i++) {
-            chunks[i] = new Chunk(((float) (((float) i) + 0.5f) * (screenWidth / NUMBER_OF_CHUNKS)), (screenHeight - (screenHeight - screenWidth) / 8));
+            chunks[i] = new Chunk(((float) (((float) i) + 0.5f) * (screenWidth / NUMBER_OF_CHUNKS)), (screenHeight - (screenHeight - screenWidth) / 2 + Chunk.BLOCK_SIZE * 2));
             chunks[i].x += screenWidth;
         }
     }
@@ -202,7 +204,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
             if (!touch) {
                 if (chunk != null) {
                     float vx = touchX;
-                    float vy = touchY + Chunk.BLOCK_SIZE / 2f;
+                    float vy = touchY - Chunk.BLOCK_SIZE + Chunk.BLOCK_SIZE / 2f;
 
                     boolean valid = grid.validate(vx, vy, chunk);
                     if (valid) {
@@ -215,7 +217,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
                         chunk.setOrigin(grid.getPosX(vx), grid.getPosY(vy));
                     } else {
                         chunk.used = false;
-                        chunk.targetScale = 2;
+                        chunk.targetScale = 3;
                         chunk.targetPadding = Chunk.BLOCK_PADDING;
                     }
                 }
@@ -249,7 +251,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
                     colorDown = true;
                 }
                 if (settingsButton.contains(touchX, touchY)) {
-                    settingsDown = true;
+//                    settingsDown = true;
                 }
             }
 
@@ -359,9 +361,13 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 
             if (touchRelease) {
                 if (resumeDown) {
+                    restartGame();
+
                     menu = null;
                     resumeDown = false;
                 } else if (exitDown) {
+                    restartGame();
+
                     menu = MAIN;
                     exitDown = false;
                 }
@@ -447,6 +453,15 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
         if (menu == SETTINGS) {
 
         }
+
+        if (menu == PAUSE) {
+
+        }
+
+        if (menu == GAME_OVER) {
+            handleGameUpdate();
+        }
+
     }
 
     private void handleMenuDraw(Canvas canvas) {
@@ -488,6 +503,12 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
         }
 
         if (menu == GAME_OVER) {
+            drawGame(canvas);
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                canvas.drawColor(Color.argb(0.1f,Color.red(Palette.BACKGROUND),Color.green(Palette.BACKGROUND),Color.blue(Palette.BACKGROUND)));
+            }
+
             paint.setColor(Palette.FOREGROUND);
             paint.setTextSize(Chunk.BLOCK_SIZE * 1.5f);
             paint.setTextAlign(Paint.Align.CENTER);
@@ -555,14 +576,14 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
             canvas.drawText("Palette", colorButton.centerX(), colorButton.centerY() + Chunk.BLOCK_SIZE / 3, stkPaint);
             canvas.drawText("Palette", colorButton.centerX(), colorButton.centerY() + Chunk.BLOCK_SIZE / 3, paint);
 
-            if (settingsDown)
-                paint.setColor(Palette.FOREGROUND);
-            else
-                paint.setColor(Palette.getColor(6));
-            canvas.drawRect(settingsButton, paint);
-            paint.setColor(Palette.TEXT);
-            canvas.drawText("Settings", settingsButton.centerX(), settingsButton.centerY() + Chunk.BLOCK_SIZE / 3, stkPaint);
-            canvas.drawText("Settings", settingsButton.centerX(), settingsButton.centerY() + Chunk.BLOCK_SIZE / 3, paint);
+//            if (settingsDown)
+//                paint.setColor(Palette.FOREGROUND);
+//            else
+//                paint.setColor(Palette.getColor(6));
+//            canvas.drawRect(settingsButton, paint);
+//            paint.setColor(Palette.TEXT);
+//            canvas.drawText("Settings", settingsButton.centerX(), settingsButton.centerY() + Chunk.BLOCK_SIZE / 3, stkPaint);
+//            canvas.drawText("Settings", settingsButton.centerX(), settingsButton.centerY() + Chunk.BLOCK_SIZE / 3, paint);
         }
 
         if (menu == SCORE) {
@@ -670,50 +691,53 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
         if (menu != null) {
             handleMenuUpdate();
         } else {
+            handleGameUpdate();
+        }
+    }
+
+    private void handleGameUpdate() {
 
 
+        for (int i = 0; i < NUMBER_OF_CHUNKS; i++) {
+            chunks[i].update();
+        }
+
+        if (chunk != null) {
+            chunk.x = touchX;
+            chunk.y = touchY - Chunk.BLOCK_SIZE;
+        }
+
+
+        if (counter < 12) {
+            counter++;
+        } else if (counter == 12) {
+            grid.placeMask();
+            score += grid.update();
+            mask = new Mask(grid.mask);
             for (int i = 0; i < NUMBER_OF_CHUNKS; i++) {
-                chunks[i].update();
-            }
-
-            if (chunk != null) {
-                chunk.x = touchX;
-                chunk.y = touchY - Chunk.SIZE;
-            }
-
-
-            if (counter < 12) {
-                counter++;
-            } else if (counter == 12) {
-                grid.placeMask();
-                score += grid.update();
-                mask = new Mask(grid.mask);
-                for (int i = 0; i < NUMBER_OF_CHUNKS; i++) {
-                    if (chunks[i].used) {
-                        chunks[i].active = false;
-                    }
+                if (chunks[i].used) {
+                    chunks[i].active = false;
                 }
-
-                if (restock) {
-                    resetChunks();
-                    restock = false;
-                }
-                counter++;
-
-                checkGameOver();
-
             }
 
-            if (mask != null)
-                mask.update();
-
-            if (displayScore < score)
-                displayScore += (score - displayScore) / 100 * 5;
-
-            if (displayScore > highscore) {
-                highscore = displayScore;
+            if (restock) {
+                resetChunks();
+                restock = false;
             }
+            counter++;
 
+            checkGameOver();
+
+        }
+
+        if (mask != null)
+            mask.update();
+
+        if (displayScore < score)
+            displayScore += (score - displayScore) / 100 * 5;
+
+        if (displayScore > highscore) {
+            highscore = displayScore;
         }
 
     }
@@ -737,7 +761,6 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
             }
 
             menu = GAME_OVER;
-            restartGame();
         }
     }
 
@@ -753,40 +776,46 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
                 handleMenuDraw(canvas);
 
             } else {
-                grid.draw(canvas, paint);
-
-                drawChunks(canvas);
-
-                drawMask(canvas);
-
-                paint.setTextSize(Chunk.BLOCK_SIZE * 1.2f);
-
-                paint.setColor(Palette.FOREGROUND);
-                paint.setTextAlign(Paint.Align.LEFT);
-                canvas.drawText("" + (int) displayScore, screenWidth / 2 + Chunk.BLOCK_SIZE, Chunk.BLOCK_SIZE * 2.5f, paint);
-
-                paint.setColor(Palette.MIDGROUND);
-                paint.setTextAlign(Paint.Align.CENTER);
-                canvas.drawText("/", screenWidth / 2, Chunk.BLOCK_SIZE * 2.5f, paint);
-
-                paint.setColor(Palette.MIDGROUND);
-                paint.setTextAlign(Paint.Align.RIGHT);
-                canvas.drawText("" + (int) highscore, screenWidth / 2 - Chunk.BLOCK_SIZE, Chunk.BLOCK_SIZE * 2.5f, paint);
-
-                if (pauseDown)
-                    paint.setColor(Palette.FOREGROUND);
-                else
-                    paint.setColor(Palette.MIDGROUND);
-
-                canvas.drawRect(Chunk.BLOCK_SIZE * 0.5f, Chunk.BLOCK_SIZE * 0.5f,
-                        Chunk.BLOCK_SIZE * .75f, Chunk.BLOCK_SIZE * 1.5f, paint);
-
-                canvas.drawRect(Chunk.BLOCK_SIZE * 1f, Chunk.BLOCK_SIZE * 0.5f,
-                        Chunk.BLOCK_SIZE * 1.25f, Chunk.BLOCK_SIZE * 1.5f, paint);
-
+                drawGame(canvas);
             }
 
         }
+    }
+
+    private void drawGame(Canvas canvas) {
+
+        grid.draw(canvas, paint);
+
+        drawChunks(canvas);
+
+        drawMask(canvas);
+
+        paint.setTextSize(Chunk.BLOCK_SIZE * 1.2f);
+
+        paint.setColor(Palette.FOREGROUND);
+        paint.setTextAlign(Paint.Align.LEFT);
+        canvas.drawText("" + (int) displayScore, screenWidth / 2 + Chunk.BLOCK_SIZE, Chunk.BLOCK_SIZE * 2.5f, paint);
+
+        paint.setColor(Palette.MIDGROUND);
+        paint.setTextAlign(Paint.Align.CENTER);
+        canvas.drawText("/", screenWidth / 2, Chunk.BLOCK_SIZE * 2.5f, paint);
+
+        paint.setColor(Palette.MIDGROUND);
+        paint.setTextAlign(Paint.Align.RIGHT);
+        canvas.drawText("" + (int) highscore, screenWidth / 2 - Chunk.BLOCK_SIZE, Chunk.BLOCK_SIZE * 2.5f, paint);
+
+        if (pauseDown)
+            paint.setColor(Palette.FOREGROUND);
+        else
+            paint.setColor(Palette.MIDGROUND);
+
+        canvas.drawRect(Chunk.BLOCK_SIZE * 0.5f, Chunk.BLOCK_SIZE * 0.5f,
+                Chunk.BLOCK_SIZE * .75f, Chunk.BLOCK_SIZE * 1.5f, paint);
+
+        canvas.drawRect(Chunk.BLOCK_SIZE * 1f, Chunk.BLOCK_SIZE * 0.5f,
+                Chunk.BLOCK_SIZE * 1.25f, Chunk.BLOCK_SIZE * 1.5f, paint);
+
+
     }
 
 
