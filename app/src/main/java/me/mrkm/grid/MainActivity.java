@@ -48,7 +48,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
         adView = findViewById(R.id.adView);
-        AdRequest adRequest = new AdRequest.Builder().addTestDevice(AdRequest.DEVICE_ID_EMULATOR).build();
+        AdRequest adRequest = new AdRequest.Builder().build();
         adView.loadAd(adRequest);
     }
 
