@@ -22,7 +22,6 @@ import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.games.Games;
-import com.google.android.gms.games.GamesClient;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
@@ -264,7 +263,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
                 } else if (scoreDown) {
                     showScores();
 
-                    menu = SCORE;
+                    //menu = SCORE;
                     scoreDown = false;
                 } else if (colorDown) {
                     menu = COLOR;
@@ -456,7 +455,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
             }
 
             if (splashCounter < 50) {
-                splashY -= (splashY - screenHeight * 0.175f) / 5;
+                splashY -= (splashY - screenHeight * 0.2f) / 3;
             }
         }
 
@@ -504,17 +503,17 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 
     private void handleMenuDraw(Canvas canvas) {
         if (menu == SPLASH) {
-            paint.setColor(Palette.FOREGROUND);
+            paint.setColor(Palette.TEXT);
             paint.setTextSize(Chunk.BLOCK_SIZE * 1.5f);
             paint.setTextAlign(Paint.Align.CENTER);
-            canvas.drawText("Grid", splashX, splashY, paint);
+            canvas.drawText( getResources().getString(R.string.grid), splashX, splashY, paint);
 
         }
         if (menu == PAUSE) {
-            paint.setColor(Palette.FOREGROUND);
+            paint.setColor(Palette.TEXT);
             paint.setTextSize(Chunk.BLOCK_SIZE * 1.5f);
             paint.setTextAlign(Paint.Align.CENTER);
-            canvas.drawText("Paused", screenWidth / 2, screenHeight / 3, paint);
+            canvas.drawText( getResources().getString(R.string.paused), screenWidth / 2, screenHeight / 3, paint);
 
             paint.setTextSize(Chunk.BLOCK_SIZE * 1f);
             stkPaint.setTextSize(Chunk.BLOCK_SIZE * 1f);
@@ -526,8 +525,8 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
                 paint.setColor(Palette.getColor(8));
             canvas.drawRect(resumeButton, paint);
             paint.setColor(Palette.TEXT);
-            canvas.drawText("Resume", resumeButton.centerX(), resumeButton.centerY() + Chunk.BLOCK_SIZE / 3, stkPaint);
-            canvas.drawText("Resume", resumeButton.centerX(), resumeButton.centerY() + Chunk.BLOCK_SIZE / 3, paint);
+            canvas.drawText( getResources().getString(R.string.resume), resumeButton.centerX(), resumeButton.centerY() + Chunk.BLOCK_SIZE / 3, stkPaint);
+            canvas.drawText( getResources().getString(R.string.resume), resumeButton.centerX(), resumeButton.centerY() + Chunk.BLOCK_SIZE / 3, paint);
 
             if (exitDown)
                 paint.setColor(Palette.FOREGROUND);
@@ -535,8 +534,8 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
                 paint.setColor(Palette.getColor(3));
             canvas.drawRect(exitButton, paint);
             paint.setColor(Palette.TEXT);
-            canvas.drawText("Menu", exitButton.centerX(), exitButton.centerY() + Chunk.BLOCK_SIZE / 3, stkPaint);
-            canvas.drawText("Menu", exitButton.centerX(), exitButton.centerY() + Chunk.BLOCK_SIZE / 3, paint);
+            canvas.drawText( getResources().getString(R.string.menu), exitButton.centerX(), exitButton.centerY() + Chunk.BLOCK_SIZE / 3, stkPaint);
+            canvas.drawText( getResources().getString(R.string.menu), exitButton.centerX(), exitButton.centerY() + Chunk.BLOCK_SIZE / 3, paint);
 
         }
 
@@ -544,17 +543,23 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
             drawGame(canvas);
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                canvas.drawColor(Color.argb(0.1f,Color.red(Palette.BACKGROUND),Color.green(Palette.BACKGROUND),Color.blue(Palette.BACKGROUND)));
+                canvas.drawColor(Color.argb(0.2f, 0f, 0f, 0f));
+            } else {
+                canvas.drawColor(Palette.BACKGROUND);
             }
 
-            paint.setColor(Palette.FOREGROUND);
+            paint.setColor(Palette.TEXT);
+
             paint.setTextSize(Chunk.BLOCK_SIZE * 1.5f);
             paint.setTextAlign(Paint.Align.CENTER);
+            stkPaint.setTextSize(Chunk.BLOCK_SIZE * 1.5f);
+            stkPaint.setTextAlign(Paint.Align.CENTER);
+
+            canvas.drawText("Game Over", screenWidth / 2, screenHeight / 3, stkPaint);
             canvas.drawText("Game Over", screenWidth / 2, screenHeight / 3, paint);
 
             paint.setTextSize(Chunk.BLOCK_SIZE * 1f);
             stkPaint.setTextSize(Chunk.BLOCK_SIZE * 1f);
-            stkPaint.setTextAlign(Paint.Align.CENTER);
 
             if (resumeDown)
                 paint.setColor(Palette.FOREGROUND);
@@ -571,16 +576,16 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
                 paint.setColor(Palette.getColor(3));
             canvas.drawRect(exitButton, paint);
             paint.setColor(Palette.TEXT);
-            canvas.drawText("Menu", exitButton.centerX(), exitButton.centerY() + Chunk.BLOCK_SIZE / 3, stkPaint);
-            canvas.drawText("Menu", exitButton.centerX(), exitButton.centerY() + Chunk.BLOCK_SIZE / 3, paint);
+            canvas.drawText( getResources().getString(R.string.menu), exitButton.centerX(), exitButton.centerY() + Chunk.BLOCK_SIZE / 3, stkPaint);
+            canvas.drawText( getResources().getString(R.string.menu), exitButton.centerX(), exitButton.centerY() + Chunk.BLOCK_SIZE / 3, paint);
 
         }
 
         if (menu == MAIN) {
-            paint.setColor(Palette.FOREGROUND);
+            paint.setColor(Palette.TEXT);
             paint.setTextSize(Chunk.BLOCK_SIZE * 1.5f);
             paint.setTextAlign(Paint.Align.CENTER);
-            canvas.drawText("Grid", splashX, splashY, paint);
+            canvas.drawText( getResources().getString(R.string.grid), splashX, splashY, paint);
 
             paint.setTextSize(Chunk.BLOCK_SIZE * 1f);
             stkPaint.setTextSize(Chunk.BLOCK_SIZE * 1f);
@@ -593,8 +598,8 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
                 paint.setColor(Palette.getColor(8));
             canvas.drawRect(playButton, paint);
             paint.setColor(Palette.TEXT);
-            canvas.drawText("Play", playButton.centerX(), playButton.centerY() + Chunk.BLOCK_SIZE / 3, stkPaint);
-            canvas.drawText("Play", playButton.centerX(), playButton.centerY() + Chunk.BLOCK_SIZE / 3, paint);
+            canvas.drawText( getResources().getString(R.string.play), playButton.centerX(), playButton.centerY() + Chunk.BLOCK_SIZE / 3, stkPaint);
+            canvas.drawText( getResources().getString(R.string.play), playButton.centerX(), playButton.centerY() + Chunk.BLOCK_SIZE / 3, paint);
 
             if (scoreDown)
                 paint.setColor(Palette.FOREGROUND);
@@ -602,8 +607,8 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
                 paint.setColor(Palette.getColor(3));
             canvas.drawRect(scoreButton, paint);
             paint.setColor(Palette.TEXT);
-            canvas.drawText("Scores", scoreButton.centerX(), scoreButton.centerY() + Chunk.BLOCK_SIZE / 3, stkPaint);
-            canvas.drawText("Scores", scoreButton.centerX(), scoreButton.centerY() + Chunk.BLOCK_SIZE / 3, paint);
+            canvas.drawText( getResources().getString(R.string.leaderboard), scoreButton.centerX(), scoreButton.centerY() + Chunk.BLOCK_SIZE / 3, stkPaint);
+            canvas.drawText( getResources().getString(R.string.leaderboard), scoreButton.centerX(), scoreButton.centerY() + Chunk.BLOCK_SIZE / 3, paint);
 
             if (colorDown)
                 paint.setColor(Palette.FOREGROUND);
@@ -611,8 +616,8 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
                 paint.setColor(Palette.getColor(7));
             canvas.drawRect(colorButton, paint);
             paint.setColor(Palette.TEXT);
-            canvas.drawText("Palette", colorButton.centerX(), colorButton.centerY() + Chunk.BLOCK_SIZE / 3, stkPaint);
-            canvas.drawText("Palette", colorButton.centerX(), colorButton.centerY() + Chunk.BLOCK_SIZE / 3, paint);
+            canvas.drawText( getResources().getString(R.string.palette), colorButton.centerX(), colorButton.centerY() + Chunk.BLOCK_SIZE / 3, stkPaint);
+            canvas.drawText( getResources().getString(R.string.palette), colorButton.centerX(), colorButton.centerY() + Chunk.BLOCK_SIZE / 3, paint);
 
 //            if (settingsDown)
 //                paint.setColor(Palette.FOREGROUND);
@@ -644,8 +649,8 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
                 paint.setColor(Palette.getColor(3));
             canvas.drawRect(exitButton, paint);
             paint.setColor(Palette.TEXT);
-            canvas.drawText("Menu", exitButton.centerX(), exitButton.centerY() + Chunk.BLOCK_SIZE / 3, stkPaint);
-            canvas.drawText("Menu", exitButton.centerX(), exitButton.centerY() + Chunk.BLOCK_SIZE / 3, paint);
+            canvas.drawText( getResources().getString(R.string.menu), exitButton.centerX(), exitButton.centerY() + Chunk.BLOCK_SIZE / 3, stkPaint);
+            canvas.drawText( getResources().getString(R.string.menu), exitButton.centerX(), exitButton.centerY() + Chunk.BLOCK_SIZE / 3, paint);
 
         }
 
@@ -653,7 +658,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
             paint.setColor(Palette.FOREGROUND);
             paint.setTextSize(Chunk.BLOCK_SIZE * 1.5f);
             paint.setTextAlign(Paint.Align.CENTER);
-            canvas.drawText("Palette", splashX, splashY, paint);
+            canvas.drawText( getResources().getString(R.string.palette), splashX, splashY, paint);
 
             paint.setTextSize(Chunk.BLOCK_SIZE * 1f);
             stkPaint.setTextSize(Chunk.BLOCK_SIZE * 1f);
@@ -666,8 +671,8 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 
             canvas.drawRect(lightButton, paint);
             paint.setColor(Palette.TEXT);
-            canvas.drawText("Light", lightButton.centerX(), lightButton.centerY() + Chunk.BLOCK_SIZE / 3, stkPaint);
-            canvas.drawText("Light", lightButton.centerX(), lightButton.centerY() + Chunk.BLOCK_SIZE / 3, paint);
+            canvas.drawText( getResources().getString(R.string.light), lightButton.centerX(), lightButton.centerY() + Chunk.BLOCK_SIZE / 3, stkPaint);
+            canvas.drawText( getResources().getString(R.string.light), lightButton.centerX(), lightButton.centerY() + Chunk.BLOCK_SIZE / 3, paint);
 
             if (darkDown)
                 paint.setColor(Palette.MIDGROUND);
@@ -675,8 +680,8 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
                 paint.setColor(Palette.FOREGROUND);
             canvas.drawRect(darkButton, paint);
             paint.setColor(Palette.TEXT);
-            canvas.drawText("Dark", darkButton.centerX(), darkButton.centerY() + Chunk.BLOCK_SIZE / 3, stkPaint);
-            canvas.drawText("Dark", darkButton.centerX(), darkButton.centerY() + Chunk.BLOCK_SIZE / 3, paint);
+            canvas.drawText( getResources().getString(R.string.dark), darkButton.centerX(), darkButton.centerY() + Chunk.BLOCK_SIZE / 3, stkPaint);
+            canvas.drawText( getResources().getString(R.string.dark), darkButton.centerX(), darkButton.centerY() + Chunk.BLOCK_SIZE / 3, paint);
 
 
             if (exitDown)
@@ -685,8 +690,8 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
                 paint.setColor(Palette.getColor(3));
             canvas.drawRect(exitButton, paint);
             paint.setColor(Palette.TEXT);
-            canvas.drawText("Menu", exitButton.centerX(), exitButton.centerY() + Chunk.BLOCK_SIZE / 3, stkPaint);
-            canvas.drawText("Menu", exitButton.centerX(), exitButton.centerY() + Chunk.BLOCK_SIZE / 3, paint);
+            canvas.drawText( getResources().getString(R.string.menu), exitButton.centerX(), exitButton.centerY() + Chunk.BLOCK_SIZE / 3, stkPaint);
+            canvas.drawText( getResources().getString(R.string.menu), exitButton.centerX(), exitButton.centerY() + Chunk.BLOCK_SIZE / 3, paint);
 
         }
 
@@ -706,8 +711,8 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
                 paint.setColor(Palette.getColor(3));
             canvas.drawRect(exitButton, paint);
             paint.setColor(Palette.TEXT);
-            canvas.drawText("Menu", exitButton.centerX(), exitButton.centerY() + Chunk.BLOCK_SIZE / 3, stkPaint);
-            canvas.drawText("Menu", exitButton.centerX(), exitButton.centerY() + Chunk.BLOCK_SIZE / 3, paint);
+            canvas.drawText( getResources().getString(R.string.menu), exitButton.centerX(), exitButton.centerY() + Chunk.BLOCK_SIZE / 3, stkPaint);
+            canvas.drawText( getResources().getString(R.string.menu), exitButton.centerX(), exitButton.centerY() + Chunk.BLOCK_SIZE / 3, paint);
 
         }
     }
@@ -831,11 +836,11 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 
         paint.setTextSize(Chunk.BLOCK_SIZE * 1.2f);
 
-        paint.setColor(Palette.FOREGROUND);
+        paint.setColor(Palette.TEXT);
         paint.setTextAlign(Paint.Align.LEFT);
         canvas.drawText("" + (int) displayScore, screenWidth / 2 + Chunk.BLOCK_SIZE, Chunk.BLOCK_SIZE * 2.5f, paint);
 
-        paint.setColor(Palette.MIDGROUND);
+        paint.setColor(Palette.FOREGROUND);
         paint.setTextAlign(Paint.Align.CENTER);
         canvas.drawText("/", screenWidth / 2, Chunk.BLOCK_SIZE * 2.5f, paint);
 
@@ -844,9 +849,9 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
         canvas.drawText("" + (int) highscore, screenWidth / 2 - Chunk.BLOCK_SIZE, Chunk.BLOCK_SIZE * 2.5f, paint);
 
         if (pauseDown)
-            paint.setColor(Palette.FOREGROUND);
+            paint.setColor(Palette.TEXT);
         else
-            paint.setColor(Palette.MIDGROUND);
+            paint.setColor(Palette.FOREGROUND);
 
         canvas.drawRect(Chunk.BLOCK_SIZE * 0.5f, Chunk.BLOCK_SIZE * 0.5f,
                 Chunk.BLOCK_SIZE * .75f, Chunk.BLOCK_SIZE * 1.5f, paint);

@@ -7,7 +7,7 @@ public class Palette {
     public static int DARK = Color.rgb(58, 60, 62);
     public static int BACKGROUND = Color.rgb(58, 60, 62);
     public static int FOREGROUND = Color.LTGRAY;
-    public static int TEXT = Color.LTGRAY;
+    public static int TEXT = Color.WHITE;
     public static int MIDGROUND = Color.GRAY;
     public static int BLACK = Color.BLACK;
 
