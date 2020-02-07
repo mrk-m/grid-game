@@ -124,14 +124,14 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
                 new RectF(Chunk.BLOCK_SIZE, screenHeight / 6 * 5 - Chunk.BLOCK_SIZE / 2, screenWidth - Chunk.BLOCK_SIZE, screenHeight / 6 * 6 - Chunk.BLOCK_SIZE);
 
         resumeButton =
-                new RectF(Chunk.BLOCK_SIZE, screenHeight / 6 * 4 - Chunk.BLOCK_SIZE / 2, screenWidth - Chunk.BLOCK_SIZE, screenHeight / 6 * 5 - Chunk.BLOCK_SIZE);
+                new RectF(Chunk.BLOCK_SIZE, screenHeight / 5 * 3 - Chunk.BLOCK_SIZE / 2, screenWidth - Chunk.BLOCK_SIZE, screenHeight / 5 * 4 - Chunk.BLOCK_SIZE);
         exitButton =
-                new RectF(Chunk.BLOCK_SIZE, screenHeight / 6 * 5 - Chunk.BLOCK_SIZE / 2, screenWidth - Chunk.BLOCK_SIZE, screenHeight / 6 * 6 - Chunk.BLOCK_SIZE);
+                new RectF(Chunk.BLOCK_SIZE, screenHeight / 5 * 4 - Chunk.BLOCK_SIZE / 2, screenWidth - Chunk.BLOCK_SIZE, screenHeight / 5 * 5 - Chunk.BLOCK_SIZE);
 
         lightButton =
-                new RectF(Chunk.BLOCK_SIZE, screenHeight / 6 * 3 - Chunk.BLOCK_SIZE / 2, screenWidth - Chunk.BLOCK_SIZE, screenHeight / 6 * 4 - Chunk.BLOCK_SIZE);
+                new RectF(Chunk.BLOCK_SIZE, screenHeight / 5 * 3 - Chunk.BLOCK_SIZE / 2, screenWidth - Chunk.BLOCK_SIZE, screenHeight / 5 * 4 - Chunk.BLOCK_SIZE);
         darkButton =
-                new RectF(Chunk.BLOCK_SIZE, screenHeight / 6 * 4 - Chunk.BLOCK_SIZE / 2, screenWidth - Chunk.BLOCK_SIZE, screenHeight / 6 * 5 - Chunk.BLOCK_SIZE);
+                new RectF(Chunk.BLOCK_SIZE, screenHeight / 5 * 4 - Chunk.BLOCK_SIZE / 2, screenWidth - Chunk.BLOCK_SIZE, screenHeight / 5 * 5 - Chunk.BLOCK_SIZE);
 
         loadData();
 
@@ -183,7 +183,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 
             if (touchDown) {
                 if (chunk == null && counter > 12) {
-                    if (touchY < Chunk.BLOCK_SIZE * 2 && touchX < Chunk.BLOCK_SIZE * 2) {
+                    if (touchY < Chunk.BLOCK_SIZE * 3 && touchX < Chunk.BLOCK_SIZE * 3) {
                         pauseDown = true;
                     } else if (touchY > screenHeight - (screenHeight - screenWidth) / 2) {
                         for (int i = 0; i < NUMBER_OF_CHUNKS; i++) {
@@ -853,11 +853,11 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
         else
             paint.setColor(Palette.FOREGROUND);
 
-        canvas.drawRect(Chunk.BLOCK_SIZE * 0.5f, Chunk.BLOCK_SIZE * 0.5f,
-                Chunk.BLOCK_SIZE * .75f, Chunk.BLOCK_SIZE * 1.5f, paint);
+        canvas.drawRect(Chunk.BLOCK_SIZE * 0.5f, Chunk.BLOCK_SIZE * 1.5f,
+                Chunk.BLOCK_SIZE * .75f, Chunk.BLOCK_SIZE * 2.5f, paint);
 
-        canvas.drawRect(Chunk.BLOCK_SIZE * 1f, Chunk.BLOCK_SIZE * 0.5f,
-                Chunk.BLOCK_SIZE * 1.25f, Chunk.BLOCK_SIZE * 1.5f, paint);
+        canvas.drawRect(Chunk.BLOCK_SIZE * 1f, Chunk.BLOCK_SIZE * 1.5f,
+                Chunk.BLOCK_SIZE * 1.25f, Chunk.BLOCK_SIZE * 2.5f, paint);
 
 
     }
