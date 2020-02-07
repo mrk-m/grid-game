@@ -24,6 +24,7 @@ import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.games.Games;
 import com.google.android.gms.games.GamesClient;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 
 import static android.content.Context.MODE_PRIVATE;
@@ -46,6 +47,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
     private float touchX = 0f;
     private float touchY = 0f;
 
+    boolean highscoreNotPosted = false;
 
     private Grid grid;
 
@@ -260,6 +262,8 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
                     menu = null;
                     playDown = false;
                 } else if (scoreDown) {
+                    showScores();
+
                     menu = SCORE;
                     scoreDown = false;
                 } else if (colorDown) {
@@ -375,6 +379,24 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
         }
     }
 
+    private static final int RC_LEADERBOARD_UI = 9004;
+
+    private void showScores() {
+        GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(getContext());
+
+        if (account != null) {
+
+            Games.getLeaderboardsClient(((Activity) getContext()), account)
+                    .getLeaderboardIntent(((Activity) getContext()).getString(R.string.leaderboard_high_scores))
+                    .addOnSuccessListener(new OnSuccessListener<Intent>() {
+                        @Override
+                        public void onSuccess(Intent intent) {
+                            ((Activity) getContext()).startActivityForResult(intent, RC_LEADERBOARD_UI);
+                        }
+                    });
+        }
+    }
+
     private void restartGame() {
         displayScore = 0;
         score = 0;
@@ -459,9 +481,25 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
         }
 
         if (menu == GAME_OVER) {
+            if (highscoreNotPosted) {
+                postHighScore();
+            }
+
             handleGameUpdate();
         }
 
+    }
+
+    private void postHighScore() {
+        GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(((Activity) getContext()));
+        
+        if (account != null) {
+
+            Games.getLeaderboardsClient(((Activity) getContext()), account)
+                    .submitScore(((Activity) getContext()).getString(R.string.leaderboard_high_scores), (int) highscore);
+        }
+        
+        highscoreNotPosted = false;
     }
 
     private void handleMenuDraw(Canvas canvas) {
@@ -758,6 +796,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 
             if (displayScore > highscore) {
                 highscore = displayScore;
+                highscoreNotPosted = true;
             }
 
             menu = GAME_OVER;
