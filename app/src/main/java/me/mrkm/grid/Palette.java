@@ -36,6 +36,7 @@ public class Palette {
         colors[0] = Color.LTGRAY;
         THEME_ID = 1;
 
+        TEXT = DARK;
     }
 
     public static void setDark() {
@@ -44,6 +45,8 @@ public class Palette {
         MIDGROUND = Color.GRAY;
         colors[0] = Color.rgb(77, 79, 81);
         THEME_ID = 0;
+
+        TEXT = Color.WHITE;
     }
 
     public static void load(int id) {

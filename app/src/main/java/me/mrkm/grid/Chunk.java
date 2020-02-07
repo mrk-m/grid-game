@@ -153,8 +153,8 @@ public class Chunk {
 
         int type = new Random().nextInt(CHUNKS.length);
         data = CHUNKS[type];
-        int[] test = {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1};
-        data = test;
+//        int[] test = {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1};
+//        data = test;
 
         // Calculate width and height
 

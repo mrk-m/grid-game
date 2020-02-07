@@ -103,7 +103,6 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
         stkPaint = new Paint();
         stkPaint.setStyle(Paint.Style.STROKE);
         stkPaint.setStrokeWidth(Chunk.BLOCK_SIZE / 8);
-        stkPaint.setColor(Palette.BACKGROUND);
 
         grid = new Grid();
         grid.setPosition(screenWidth, screenHeight);
@@ -129,9 +128,9 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
                 new RectF(Chunk.BLOCK_SIZE, screenHeight / 5 * 4 - Chunk.BLOCK_SIZE / 2, screenWidth - Chunk.BLOCK_SIZE, screenHeight / 5 * 5 - Chunk.BLOCK_SIZE);
 
         lightButton =
-                new RectF(Chunk.BLOCK_SIZE, screenHeight / 5 * 3 - Chunk.BLOCK_SIZE / 2, screenWidth - Chunk.BLOCK_SIZE, screenHeight / 5 * 4 - Chunk.BLOCK_SIZE);
+                new RectF(Chunk.BLOCK_SIZE, screenHeight / 5 * 2 - Chunk.BLOCK_SIZE / 2, screenWidth - Chunk.BLOCK_SIZE, screenHeight / 5 * 3 - Chunk.BLOCK_SIZE);
         darkButton =
-                new RectF(Chunk.BLOCK_SIZE, screenHeight / 5 * 4 - Chunk.BLOCK_SIZE / 2, screenWidth - Chunk.BLOCK_SIZE, screenHeight / 5 * 5 - Chunk.BLOCK_SIZE);
+                new RectF(Chunk.BLOCK_SIZE, screenHeight / 5 * 3 - Chunk.BLOCK_SIZE / 2, screenWidth - Chunk.BLOCK_SIZE, screenHeight / 5 * 4 - Chunk.BLOCK_SIZE);
 
         loadData();
 
@@ -815,6 +814,9 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
         if (canvas != null) {
 
             canvas.drawColor(Palette.BACKGROUND);
+
+            stkPaint.setColor(Palette.BACKGROUND);
+
 
             if (menu != null) {
                 handleMenuDraw(canvas);
